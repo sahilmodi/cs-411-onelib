@@ -19,7 +19,7 @@ CREATE TABLE User (
     Age INT, 
     Zipcode INT NOT NULL, 
     PaymentNumber INT,
-    Passwords VARCHAR(255) NOT NULL
+    Password VARCHAR(255) NOT NULL
 );
 
 CREATE TABLE LibraryBook (
