@@ -3,8 +3,6 @@ import pandas as pd
 import random
 from tqdm import tqdm
 
-
-
 library = pd.read_csv("library.csv")
 books = pd.read_csv("books.csv")
 
