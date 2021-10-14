@@ -3,13 +3,13 @@ import pandas as pd
 import random
 from tqdm import tqdm
 
-library = pd.read_csv("library.csv")
-books = pd.read_csv("books.csv")
+library = pd.read_csv("Library.csv")
+books = pd.read_csv("Book.csv")
 
 data = defaultdict(list)
 seed = 0
 books_per_library = 100
-for libid in tqdm(library["Library ID"].values, dynamic_ncols=True):
+for libid in tqdm(library["LibraryID"].values, dynamic_ncols=True):
     rand_books = books.sample(frac=books_per_library/books.shape[0], random_state=seed, replace=False)
     for isbn in rand_books.ISBN.values:
         data["LibraryID"].append(libid)
@@ -27,4 +27,5 @@ for libid in tqdm(library["Library ID"].values, dynamic_ncols=True):
         seed += 1
 
 library_books = pd.DataFrame.from_dict(data)
+libary_books = library_books[["LibraryID", "ISBN", "Quantity", "LateFee", "Price", "Buyable", "TimeLimitDays"]]
 library_books.to_csv("LibraryBook.csv", index=False)
