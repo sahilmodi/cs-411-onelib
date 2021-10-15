@@ -45,3 +45,5 @@ CREATE TABLE Review (
     FOREIGN KEY (ISBN) REFERENCES Book(ISBN) ON DELETE CASCADE,
     PRIMARY KEY (UserID, ISBN)
 );
+
+-- gcloud sql import csv onelib8 gs://onelib-data/LibraryBook.csv --database=onelib --table=LibraryBook --quote="22" --escape="5C" --fields-terminated-by="2C" --lines-terminated-by="0A"
