@@ -46,4 +46,15 @@ CREATE TABLE Review (
     PRIMARY KEY (UserID, ISBN)
 );
 
+CREATE TABLE BorrowedBook (
+    UserID INT,
+    LibraryID INT,
+    ISBN VARCHAR(13),
+    DueDate DATE,
+    FOREIGN KEY (UserID) REFERENCES User(UserID) ON DELETE CASCADE,
+    FOREIGN KEY (LibraryID) REFERENCES Library(LibraryID) ON DELETE CASCADE,
+    FOREIGN KEY (ISBN) REFERENCES Book(ISBN) ON DELETE CASCADE,
+    PRIMARY KEY (UserID, LibraryID, ISBN)
+);
+
 -- gcloud sql import csv onelib8 gs://onelib-data/LibraryBook.csv --database=onelib --table=LibraryBook --quote="22" --escape="5C" --fields-terminated-by="2C" --lines-terminated-by="0A"
