@@ -6,4 +6,5 @@ def test():
         print(res)
     return res
 
-def search(keyword, table)
+def search(keyword, table):
+    pass
