@@ -6,4 +6,18 @@ window.addEventListener('DOMContentLoaded', event => {
     if (datatablesSimple) {
         new simpleDatatables.DataTable(datatablesSimple);
     }
+
+    const datatableAvailBooks = document.getElementById('AvailableBooks');
+    if (datatableAvailBooks) {
+        new simpleDatatables.DataTable(datatableAvailBooks);
+    }
+
+    const databaseBorrowedBooks = document.getElementById('BorrowedBooks');
+    if (databaseBorrowedBooks) {
+        new simpleDatatables.DataTable(databaseBorrowedBooks);
+    }
 });
+
+function onRowClick() {
+    alert('hello')
+}

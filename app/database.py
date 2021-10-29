@@ -18,6 +18,20 @@ def search_review(keyword, amount):
 def search_library(keyword, amount):
     return _search("Library", "Name", keyword, amount)
 
+def get_rentable_books(library_id, amount=10):
+    with db.begin() as conn:
+        res = conn.execute(f"SELECT * FROM LibraryBook NATURAL JOIN Library NATURAL JOIN Book WHERE LibraryID={library_id}").fetchmany(amount)
+    return [b for b in res]
+
+def get_borrowed_books(user_id=None, amount=10):
+    query = "SELECT User.Name UserName, UserID, DueDate, ImageURL, Library.Name LibraryName, Title, Author, ISBN, LibraryID FROM BorrowedBook NATURAL JOIN Book NATURAL JOIN User JOIN Library USING (LibraryID)"
+    if user_id is not None:
+        query += f" WHERE UserID={user_id}"
+    with db.begin() as conn:
+        res = conn.execute(query)
+    return [r for r in res]
+
+
 def checkout_book(user_id, library_id, isbn):
     conn = db.connect()
     res = conn.execute(f"SELECT Quantity, TimeLimitDays FROM LibraryBook WHERE LibraryID={library_id} AND ISBN LIKE '{isbn}'").fetchone()
