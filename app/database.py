@@ -18,7 +18,7 @@ def search_review(keyword, amount):
 def search_library(keyword, amount):
     return _search("Library", "Name", keyword, amount)
 
-def check_out_book(user_id, library_id, isbn):
+def checkout_book(user_id, library_id, isbn):
     conn = db.connect()
     res = conn.execute(f"SELECT Quantity, TimeLimitDays FROM LibraryBook WHERE LibraryID={library_id} AND ISBN LIKE '{isbn}'").fetchone()
     if res is None:
@@ -46,4 +46,4 @@ def read_from_table(table, amount=5):
     assert table in tables
     with db.begin() as conn:
         res = conn.execute(f"SELECT * FROM {table}").fetchmany(amount)
-    return res
+    return [r for r in res]
