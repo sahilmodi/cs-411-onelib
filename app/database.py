@@ -48,6 +48,29 @@ def read_from_table(table, amount=5):
         res = conn.execute(f"SELECT * FROM {table}").fetchmany(amount)
     return [r for r in res]
 
+def fetch_allreview() ->dict:
+    conn = db.connect()
+    query='SELECT * FROM Review LIMIT 200;'
+    query_results = conn.execute(query).fetchall()
+    conn.close()
+    allreview = []
+    for result in query_results:
+        item = {
+            "ISBN": result[0],
+            "UserID": result[1],
+            "Date": result[2],
+            "StarTating": result[3],
+            "Text": result[4]
+        }
+        allreview.append(item)
+    return allreview
+
+def remove_review(isbn,user_id) -> None:
+    """ remove entries based on ISBN and UserId """
+    conn = db.connect()
+    query = 'Delete From Review where ISBN={} and UserID={};'.format(isbn,user_id)
+    conn.execute(query)
+    conn.close()
 
 
 def fetch_TopBook() -> dict:
