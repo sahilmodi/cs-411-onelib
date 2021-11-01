@@ -61,3 +61,10 @@ def read_from_table(table, amount=5):
     with db.begin() as conn:
         res = conn.execute(f"SELECT * FROM {table}").fetchmany(amount)
     return [r for r in res]
+
+def delete_review(user_id, isbn):
+    conn = db.connect()
+    q = f"DELETE FROM Review WHERE UserID = {user_id} AND ISBN LIKE '{isbn}'"
+    conn.execute(q)
+    conn.close()
+    return True
