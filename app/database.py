@@ -68,3 +68,47 @@ def delete_review(user_id, isbn):
     conn.execute(q)
     conn.close()
     return True
+
+def advanced_query_top_books():
+    conn = db.connect()
+    q = """
+        (
+            SELECT Title, YEAR(Date) AS Year
+            FROM Review NATURAL JOIN Book
+            WHERE StarRating=5 AND YEAR(Date)=2021
+            GROUP BY ISBN, YEAR(Date)
+            ORDER BY COUNT( * ) DESC LIMIT 10
+        )
+        UNION ALL
+        (
+            SELECT Title, YEAR(Date) AS Year
+            FROM Review NATURAL JOIN Book
+            WHERE StarRating=5 AND YEAR(Date)=2020
+            GROUP BY ISBN, YEAR(Date)
+            ORDER BY COUNT( * ) DESC LIMIT 10
+        );
+    """
+    res = conn.execute(q)
+    return [r for r in res]
+
+def advanced_query_top_users():
+    conn = db.connect()
+    q = """
+    (
+        SELECT Name, YEAR(Date) AS Year, Count(*) NumReviews
+        FROM Review NATURAL JOIN User
+        WHERE YEAR(Date)=2021
+        GROUP BY Review.UserID, YEAR(Date)
+        ORDER BY NumReviews DESC LIMIT 10
+    )
+    UNION ALL
+    (
+        SELECT Name, YEAR(Date) AS Year, Count(*) NumReviews
+        FROM Review NATURAL JOIN User
+        WHERE YEAR(Date)=2020
+        GROUP BY Review.UserID, YEAR(Date)
+        ORDER BY NumReviews DESC LIMIT 10
+    );
+    """
+    res = conn.execute(q)
+    return [r for r in res]

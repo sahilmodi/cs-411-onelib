@@ -10,8 +10,12 @@ from flask import jsonify, render_template, request, flash
 @app.route("/")
 def homepage():
     books = db_helper.test()
-    print(books)
     data = {"status":True, "books":books}
+
+    # advanced queries
+    data["top_books"] = db_helper.advanced_query_top_books()
+    data["top_users"] = db_helper.advanced_query_top_users()
+    print(data["top_books"])
     return render_template("index.html", **data)
 
 @app.route("/borrow_book.html", methods=['GET', 'POST'])

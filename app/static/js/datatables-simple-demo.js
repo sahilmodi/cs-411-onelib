@@ -16,6 +16,14 @@ window.addEventListener('DOMContentLoaded', event => {
     if (databaseBorrowedBooks) {
         new simpleDatatables.DataTable(databaseBorrowedBooks);
     }
+
+    if (document.getElementById('TopBooks')) {
+        new simpleDatatables.DataTable(document.getElementById('TopBooks'));
+    }
+
+    if (document.getElementById('TopUsers')) {
+        new simpleDatatables.DataTable(document.getElementById('TopUsers'));
+    }
 });
 
 function onRowClick() {
