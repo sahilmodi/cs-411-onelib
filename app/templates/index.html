@@ -65,6 +65,9 @@
                                 <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
                             </a>
                             <div class="collapse" id="collapsePages" aria-labelledby="headingTwo" data-bs-parent="#sidenavAccordion">
+                                <nav class="sb-sidenav-menu-nested nav">
+                                    <a class="nav-link" href="borrow_book.html">Borrow a Book</a>
+                                </nav>
                                 <nav class="sb-sidenav-menu-nested nav accordion" id="sidenavAccordionPages">
                                     <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#pagesCollapseAuth" aria-expanded="false" aria-controls="pagesCollapseAuth">
                                         Authentication
@@ -152,8 +155,63 @@
                                 </div>
                             </div>
                         </div>
+                        
                         <div class="row">
                             <div class="col-xl-6">
+                                <div class="card mb-4">
+                                    <div class="card-header">
+                                        <i class="fas fa-table me-1"></i>
+                                        Recent Books with Highest Ratings
+                                    </div>
+                                    <div class="card-body">
+                                        <table id="TopBooks">
+                                            <thead>
+                                                <tr>
+                                                    <th>Title</th>
+                                                    <th>Year Released</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for top_book in top_books %}
+                                                <tr>
+                                                    <td>{{ top_book.Title }}</td>
+                                                    <td>{{ top_book.Year }}</td>
+                                                </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xl-6">
+                                <div class="card mb-4">
+                                    <div class="card-header">
+                                        <i class="fas fa-table me-1"></i>
+                                        Top Reviewing Users
+                                    </div>
+                                    <div class="card-body">
+                                        <table id="TopUsers">
+                                            <thead>
+                                                <tr>
+                                                    <th>Name</th>
+                                                    <th>Year Reviewed</th>
+                                                    <th>Numer of Reviews Placed</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for top_user in top_users %}
+                                                <tr>
+                                                    <td>{{ top_user.Name }}</td>
+                                                    <td>{{ top_user.Year }}</td>
+                                                    <td>{{ top_user.NumReviews }}</td>
+                                                </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- <div class="col-xl-6">
                                 <div class="card mb-4">
                                     <div class="card-header">
                                         <i class="fas fa-chart-area me-1"></i>
@@ -170,7 +228,7 @@
                                     </div>
                                     <div class="card-body"><canvas id="myBarChart" width="100%" height="40"></canvas></div>
                                 </div>
-                            </div>
+                            </div> -->
                         </div>
                         <div class="card mb-4">
                             <div class="card-header">
