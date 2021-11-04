@@ -38,3 +38,13 @@ def add():
     db_helper.add_borrowed_book(0, 0, "019509199X")
     bb = db_helper.read_from_table("BorrowedBook")
     return jsonify({r[0]:str(r[1:]) for r in bb})
+
+@app.route("/review", methods=['GET', 'POST'])
+def reviewpage():
+    '''Define reviewpage'''
+    if request.method == "POST":
+        db_helper.remove_review(request.values['isbn'],request.values['user_id'])
+    reviews = db_helper.fetch_allreview()
+    return render_template("review.html",reviews=reviews)
+
+

@@ -24,3 +24,23 @@ window.addEventListener('DOMContentLoaded', event => {
     }
 
 });
+
+
+
+
+$(document).ready(function () {            
+    $('reviewremove').click(function () {
+        const reviewremove = $(this)
+        $.ajax({
+            type: 'POST',
+            url: '/deletereview/' + reviewremove.data('userid')+'/'+reviewremove.data('isbn'),
+            success: function (res) {
+                console.log(res.response)
+                location.reload();
+            },
+            error: function () {
+                console.log('Error');
+            }
+        });
+    });
+});
