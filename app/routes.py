@@ -39,20 +39,12 @@ def add():
     bb = db_helper.read_from_table("BorrowedBook")
     return jsonify({r[0]:str(r[1:]) for r in bb})
 
-@app.route("/review")
+@app.route("/review", methods=['GET', 'POST'])
 def reviewpage():
     '''Define reviewpage'''
+    if request.method == "POST":
+        db_helper.remove_review(request.values['isbn'],request.values['user_id'])
     reviews = db_helper.fetch_allreview()
     return render_template("review.html",reviews=reviews)
 
 
-@app.route("/deletereview/<user_id>/<isbn>", methods=['POST'])
-def deletereview(isbn,user_id):
-    """ recieved post requests for entry delete """
-    try:
-        db_helper.remove_review(isbn,user_id)
-        result = {'success': True, 'response': 'Removed review'}
-    except:
-        result = {'success': False, 'response': 'Something went wrong'}
-
-    return jsonify(result)

@@ -6,27 +6,11 @@
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
         <meta name="description" content="" />
         <meta name="author" content="" />
-        <title>Dashboard - SB Admin</title>
+        <title>Book Review</title>
         <link href="https://cdn.jsdelivr.net/npm/simple-datatables@latest/dist/style.css" rel="stylesheet" />
         <link href="{{ url_for('static', filename='css/styles.css') }}" rel="stylesheet" />
         <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/js/all.min.js" crossorigin="anonymous"></script>
-        <script>
-            
-        $('.reviewremove').click(function () {
-            const reviewremove = $(this)
-            $.ajax({
-                type: 'POST',
-                url: '/deletereview/' + reviewremove.data('userid')+'/'+reviewremove.data('isbn'),
-                success: function (res) {
-                    console.log(res.response)
-                    location.reload();
-                },
-                error: function () {
-                    console.log('Error');
-                }
-            });
-        });
-        </script>
+
     </head>
     <body class="sb-nav-fixed">
         <nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">
@@ -169,30 +153,57 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="row">
-                            <div class="col-xl-6">
-                                <div class="card mb-4">
-                                    <div class="card-header">
-                                        <i class="fas fa-chart-area me-1"></i>
-                                        Area Chart Example
-                                    </div>
-                                    <div class="card-body"><canvas id="myAreaChart" width="100%" height="40"></canvas></div>
-                                </div>
-                            </div>
-                            <div class="col-xl-6">
-                                <div class="card mb-4">
-                                    <div class="card-header">
-                                        <i class="fas fa-chart-bar me-1"></i>
-                                        Bar Chart Example
-                                    </div>
-                                    <div class="card-body"><canvas id="myBarChart" width="100%" height="40"></canvas></div>
-                                </div>
-                            </div>
-                        </div>
+
+                        <!-- Add new review -->
                         <div class="card mb-4">
                             <div class="card-header">
                                 <i class="fas fa-table me-1"></i>
-                                Review Example
+                                Reviews
+                            </div>
+                            <div class="card-body">
+                                <table id="tables">
+                                    <thead>
+                                        <tr>
+                                            <th>ISBN</th>
+                                            <th>UserID</th>
+                                            <th>Date</th>
+                                            <th>StarTating</th>
+                                            <th>Text</th>
+                                            <th>Submit</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        
+                                        <tr>
+                                            <form action="" method="post"></form>
+                                                <td><input name="isbn" value=""></td>
+                                                <td><input name="user_id" Type="int" value=""></td>
+                                                <td><input name="date" Type="date" value=""></td>
+                                                <td><input name="startating" type="text" list="ratelist" value=""></td>
+                                                <datalist id="ratelist">
+                                                    <option>1</option>
+                                                    <option>2</option>
+                                                    <option>3</option>
+                                                    <option>4</option>
+                                                    <option>5</option>
+                                                </datalist>
+                                                <td><input name="text" value=""></td>
+                                                <th><button type="submit" class="btn btn-primary" onclick="alert('Start Submit!')">Submit</button></th>
+                                            
+                                            </form>
+                                            
+                                        </tr>
+                                        
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <i class="fas fa-table me-1"></i>
+                                Reviews
                             </div>
                             <div class="card-body">
                                 <table id="datatablesSimple">
@@ -226,8 +237,14 @@
                                             <td>{{ review.Date }}</td>
                                             <td>{{ review.StarTating }}</td>
                                             <td>{{ review.Text }}</td>
-                                            <th><button type="button" onclick="alert('Start Edit!')">Edit</button></th>
-                                            <th><button type="button" class="reviewremove" data-userid="{{review.UserID}}" data-isbn="{{review.ISBN}}">Delete</button></th>
+                                            <th><button type="button" class="btn btn-primary" onclick="alert('Start Edit!')">Edit</button></th>
+                                            <th>
+                                                <form action="" method="post">
+                                                    <input type="hidden" name="isbn" value={{ review.ISBN }}>
+                                                    <input type="hidden" name="user_id" value={{ review.UserID }}>
+                                                    <button name="btnDelete" class="btn btn-primary" type="submit">Delete</button>
+                                                </form>
+                                            </th>
                                         </tr>
                                         {% endfor %}
                                     </tbody>
