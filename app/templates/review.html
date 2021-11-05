@@ -158,7 +158,7 @@
                         <div class="card mb-4">
                             <div class="card-header">
                                 <i class="fas fa-table me-1"></i>
-                                Add Review for {{isbns}}
+                                Add/Update Review for {{isbns}}
                             </div>
                             <div class="card-body">
                                 <table id="tables">
@@ -167,23 +167,24 @@
                                             <th>ISBN</th>
                                             <th>UserID</th>
                                             <th>Date</th>
-                                            <th>StarTating</th>
+                                            <th>StarRating</th>
                                             <th>Text</th>
                                             <th>Submit</th>
+                                            <th>Update</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         
                                         <tr>
                                             <form>
-                                                <td><input id="isbn" name="isbn" type="text" value={{ isbns }}></td>
+                                                <td><input id="isbn" name="isbn" type="text" value={{isbns}}></td>
                                                 <td><input id="user_id" name="user_id" type="text" Type="text" value=""></td>
                                                 <td><input id="date" name="date" Type="date"></td>
                                                 <script>
                                                     document.getElementById('date').value = new Date().toISOString().substring(0, 10);
                                                 </script>
-                                                <td><input id="startating" name="startating" type="text" list="startatinglist"></td>
-                                                <datalist id="startatinglist">
+                                                <td><input id="starrating" name="startating" type="text" list="starratinglist"></td>
+                                                <datalist id="starratinglist">
                                                     <option value="1">1</option>
                                                     <option value="2">2</option>
                                                     <option value="3">3</option>
@@ -191,22 +192,40 @@
                                                     <option value="5">5</option>
                                                 </datalist>
                                                 <td><input id="text" name="text" type="text" value=""></td>
-                                                <th><input id="submit-review" type="button" class="btn btn-primary" value="Submit" onclick="openlink()"></th>
+                                                <th><input id="submit-review" type="button" class="btn btn-primary" value="Submit" onclick="insertreview()"></th>
+                                                <th><input id="update-review" type="button" class="btn btn-primary" value="Update" onclick="updatereview()"></th>
                                                 <script>
-                                                    function openlink(){
+                                                    function insertreview(){
                                                         var isbn=document.getElementById("isbn").value;
                                                         var user_id=document.getElementById("user_id").value;
                                                         var date=document.getElementById("date").value;
-                                                        var startating=document.getElementById("startating").value;
+                                                        var starrating=document.getElementById("starrating").value;
                                                         var text=document.getElementById("text").value;
-                                                        
                                                         $.ajax({
-                                                            type:'POST',
-                                                            url: '/insertreview/'+isbn+'/'+user_id+'/'+date+'/'+startating+'/'+text,
+                                                            type: 'POST',
+                                                            url: '/insertreview/'+isbn+'/'+user_id+'/'+date+'/'+starrating+'/'+text,
                                                             success: function (res) {
                                                                 console.log(res.response)
                                                                 location.reload();
-                                                                alert("Success! Your Rating is: "+startating+", and your review is: "+text);
+                                                            },
+                                                            error: function () {
+                                                                console.log('Error');
+                                                            }
+                                                        });
+                                                    }
+
+                                                    function updatereview(){
+                                                        var isbn=document.getElementById("isbn").value;
+                                                        var user_id=document.getElementById("user_id").value;
+                                                        var date=document.getElementById("date").value;
+                                                        var starrating=document.getElementById("starrating").value;
+                                                        var text=document.getElementById("text").value;
+                                                        $.ajax({
+                                                            type: 'POST',
+                                                            url: '/editreview/'+isbn+'/'+user_id+'/'+date+'/'+starrating+'/'+text,
+                                                            success: function (res) {
+                                                                console.log(res.response)
+                                                                location.reload();
                                                             },
                                                             error: function () {
                                                                 console.log('Error');
@@ -236,7 +255,7 @@
                                             <th>ISBN</th>
                                             <th>UserID</th>
                                             <th>Date</th>
-                                            <th>StarTating</th>
+                                            <th>StarRating</th>
                                             <th>Text</th>
                                             <th>Edit</th>
                                             <th>Delet</th>
@@ -247,7 +266,7 @@
                                             <th>ISBN</th>
                                             <th>UserId</th>
                                             <th>Date</th>
-                                            <th>StarTating</th>
+                                            <th>StarRating</th>
                                             <th>Text</th>
                                             <th>Edit</th>
                                             <th>Delet</th>
@@ -259,18 +278,52 @@
                                             <td>{{ review.ISBN }}</td>
                                             <td>{{ review.UserID }}</td>
                                             <td>{{ review.Date }}</td>
-                                            <td>{{ review.StarTating }}</td>
+                                            <td>{{ review.StarRating }}</td>
                                             <td>{{ review.Text }}</td>
-                                            <th><button type="button" class="btn btn-primary" onclick="alert('Start Edit!')">Edit</button></th>
+                                            <th><button type="button" data-isbn="{{review.ISBN}}" data-userid="{{review.UserID}}" data-date="{{review.Date}}" data-starrating="{{review.StarRating}}" data-text="{{review.Text}}" class="btn btn-primary editreview">Edit</button></th>
                                             <th>
-                                                <form action="" method="post">
-                                                    <input type="hidden" name="isbn" value={{ review.ISBN }}>
-                                                    <input type="hidden" name="user_id" value={{ review.UserID }}>
-                                                    <button name="btnDelete" class="btn btn-primary" type="submit">Delete</button>
-                                                </form>
+                                                <button name="btnDelete" data-isbn="{{review.ISBN}}" data-userid="{{review.UserID}}" class="btn btn-primary remove deletereview" type="button">Delete</button>
                                             </th>
                                         </tr>
                                         {% endfor %}
+                                        <script>
+                                            $(document).ready(function () {
+                                                $('.deletereview').click(function deletereview(){
+                                                    var deletereview = $(this);
+                                                    var isbn=deletereview.data('isbn');
+                                                    var user_id=deletereview.data('userid');
+                                                    alert("The review of UserID= "+user_id+" for the book isbn = "+isbn+" will be deleted!");
+                                                    $.ajax({
+                                                        type: 'POST',
+                                                        url: '/deletereview/'+isbn+'/'+user_id,
+                                                        success: function (res) {
+                                                            console.log(res.response)
+                                                            location.reload();
+                                                        },
+                                                        error: function () {
+                                                            console.log('Error');
+                                                        }
+                                                    });
+                                                });
+
+                                                $('.editreview').click(function editreview(){
+                                                    var editreview = $(this);
+                                                    var isbn=editreview.data('isbn');
+                                                    var user_id=editreview.data('userid');
+                                                    var date=editreview.data('date');
+                                                    var starrating=editreview.data('starrating');
+                                                    var text=editreview.data('text');
+                                                    
+                                                    document.getElementById('user_id').value = user_id;
+                                                    document.getElementById('date').value = date;
+                                                    document.getElementById('starrating').value = starrating;
+                                                    document.getElementById('text').value = text;
+                                                    alert("Please use above form to update review, then click Update");
+                                                });
+                                                
+                                            });
+                                        </script>
+
                                     </tbody>
                                 </table>
                             </div>

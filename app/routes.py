@@ -39,19 +39,49 @@ def add():
     bb = db_helper.read_from_table("BorrowedBook")
     return jsonify({r[0]:str(r[1:]) for r in bb})
 
-@app.route("/review", methods=['GET', 'POST'])
+@app.route("/review")
 def reviewpage():
     '''Define reviewpage'''
-    if request.method == "POST":
-        db_helper.remove_review(request.values['isbn'],request.values['user_id'])
     reviews = db_helper.fetch_allreview()
     isbns=842332251
-    return render_template("review.html",reviews=reviews, isbns=isbns)
+    return render_template("review.html",reviews=reviews,isbns=isbns)
 
-@app.route("/insertreview/<string:isbn>/<int:user_id>/<string:date>/<int:startating>/<string:text>", methods=['GET', 'POST'])
-def insertreview(isbn,user_id,date,startating,text):
+@app.route("/review/<string:isbn>")
+def bookreviewpage(isbn):
+    '''Define reviewpage'''
+    reviews = db_helper.fetch_bookreview(isbn)
+    isbns=isbn
+    return render_template("review.html",reviews=reviews,isbns=isbns)
+
+@app.route("/insertreview/<string:isbn>/<int:user_id>/<string:date>/<int:starrating>/<string:text>", methods=['POST'])
+def insertreview(isbn,user_id,date,starrating,text):
     """ recieves post requests to add new task """
-    data = request.get_json()
-    db_helper.insert_new_review(isbn,user_id,date,startating,text)
-    result = {'success': True, 'response': 'Done'}
+    try:
+        db_helper.insert_new_review(isbn,user_id,date,starrating,text)
+        result = {'success': True, 'response': 'Done'}
+    except:
+        result = {'success': False, 'response': 'Something went wrong'}
+
     return jsonify(result)
+
+@app.route("/deletereview/<string:isbn>/<int:user_id>", methods=['POST'])
+def deletereview(isbn,user_id):
+    try:
+        db_helper.remove_review(isbn,user_id)
+        result = {'success': True, 'response': 'Done'}
+    except:
+        result = {'success': False, 'response': 'Something went wrong'}
+
+    return jsonify(result)
+
+@app.route("/editreview/<string:isbn>/<int:user_id>/<string:date>/<int:starrating>/<string:text>", methods=['POST'])
+def updatereview(isbn,user_id,date,starrating,text):
+    try:
+        db_helper.update_review(isbn,user_id,date,starrating,text)
+        result = {'success': True, 'response': 'Done'}
+    except:
+        result = {'success': False, 'response': 'Something went wrong'}
+
+    return jsonify(result)
+
+

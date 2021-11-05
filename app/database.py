@@ -73,11 +73,28 @@ def fetch_allreview() ->dict:
             "ISBN": result[0],
             "UserID": result[1],
             "Date": result[2],
-            "StarTating": result[3],
+            "StarRating": result[3],
             "Text": result[4]
         }
         allreview.append(item)
     return allreview
+
+def fetch_bookreview(isbn) ->dict:
+    conn = db.connect()
+    query='SELECT * FROM Review where ISBN LIKE "{}";'.format(isbn)
+    query_results = conn.execute(query).fetchall()
+    conn.close()
+    bookreview = []
+    for result in query_results:
+        item = {
+            "ISBN": result[0],
+            "UserID": result[1],
+            "Date": result[2],
+            "StarRating": result[3],
+            "Text": result[4]
+        }
+        bookreview.append(item)
+    return bookreview
 
 def remove_review(isbn,user_id) -> None:
     """ remove entries based on ISBN and UserId """
@@ -86,13 +103,18 @@ def remove_review(isbn,user_id) -> None:
     conn.execute(query)
     conn.close()
 
-def insert_new_review(isbn,user_id,date,startating,text)->None:
+def insert_new_review(isbn,user_id,date,starrating,text)->None:
     '''insert a new review'''
     conn = db.connect()
-    query='Insert Into Review VALUES ("{}", "{}", "{}", "{}", "{}");'.format(isbn,user_id,date,startating,text)
+    query='Insert Into Review VALUES ("{}", {}, "{}", {}, "{}");'.format(isbn,user_id,date,starrating,text)
     conn.execute(query)
     conn.close()
 
+def update_review(isbn,user_id,date,starrating,text)->None:
+    conn = db.connect()
+    query='Update Review set Date="{}", StarRating={}, Text="{}" where ISBN LIKE "{}" and UserID={};'.format(date,starrating,text,isbn,user_id)
+    conn.execute(query)
+    conn.close()
 
 
 def update_rent_librarybook(LibraryID: int, ISBN: str) -> None:
