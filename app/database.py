@@ -64,7 +64,7 @@ def read_from_table(table, amount=5):
 
 def fetch_allreview() ->dict:
     conn = db.connect()
-    query='SELECT * FROM Review LIMIT 200;'
+    query='SELECT * FROM Review where ISBN LIKE "842332251";'
     query_results = conn.execute(query).fetchall()
     conn.close()
     allreview = []
@@ -85,6 +85,14 @@ def remove_review(isbn,user_id) -> None:
     query = 'Delete From Review WHERE ISBN LIKE "{}" AND UserID={};'.format(isbn,user_id)
     conn.execute(query)
     conn.close()
+
+def insert_new_review(isbn,user_id,date,startating,text)->None:
+    '''insert a new review'''
+    conn = db.connect()
+    query='Insert Into Review VALUES ("{}", "{}", "{}", "{}", "{}");'.format(isbn,user_id,date,startating,text)
+    conn.execute(query)
+    conn.close()
+
 
 
 def update_rent_librarybook(LibraryID: int, ISBN: str) -> None:
