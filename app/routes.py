@@ -45,6 +45,13 @@ def reviewpage():
     if request.method == "POST":
         db_helper.remove_review(request.values['isbn'],request.values['user_id'])
     reviews = db_helper.fetch_allreview()
-    return render_template("review.html",reviews=reviews)
+    isbns=842332251
+    return render_template("review.html",reviews=reviews, isbns=isbns)
 
-
+@app.route("/insertreview/<string:isbn>/<int:user_id>/<string:date>/<int:startating>/<string:text>", methods=['GET', 'POST'])
+def insertreview(isbn,user_id,date,startating,text):
+    """ recieves post requests to add new task """
+    data = request.get_json()
+    db_helper.insert_new_review(isbn,user_id,date,startating,text)
+    result = {'success': True, 'response': 'Done'}
+    return jsonify(result)
