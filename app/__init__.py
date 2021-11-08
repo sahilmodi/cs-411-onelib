@@ -5,6 +5,7 @@ from flask import Flask, jsonify
 
 
 app = Flask(__name__)
+app.secret_key = "super secret key"
 
 def init_connect_engine():
     if os.environ.get("GAE_ENV") != "standard":

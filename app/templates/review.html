@@ -6,10 +6,11 @@
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
         <meta name="description" content="" />
         <meta name="author" content="" />
-        <title>Dashboard - SB Admin</title>
+        <title>Book Review for {{isbns}}</title>
         <link href="https://cdn.jsdelivr.net/npm/simple-datatables@latest/dist/style.css" rel="stylesheet" />
         <link href="{{ url_for('static', filename='css/styles.css') }}" rel="stylesheet" />
         <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/js/all.min.js" crossorigin="anonymous"></script>
+
     </head>
     <body class="sb-nav-fixed">
         <nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">
@@ -65,9 +66,6 @@
                                 <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
                             </a>
                             <div class="collapse" id="collapsePages" aria-labelledby="headingTwo" data-bs-parent="#sidenavAccordion">
-                                <nav class="sb-sidenav-menu-nested nav">
-                                    <a class="nav-link" href="borrow_book.html">Borrow a Book</a>
-                                </nav>
                                 <nav class="sb-sidenav-menu-nested nav accordion" id="sidenavAccordionPages">
                                     <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#pagesCollapseAuth" aria-expanded="false" aria-controls="pagesCollapseAuth">
                                         Authentication
@@ -155,116 +153,177 @@
                                 </div>
                             </div>
                         </div>
-                        
-                        <div class="row">
-                            <div class="col-xl-6">
-                                <div class="card mb-4">
-                                    <div class="card-header">
-                                        <i class="fas fa-table me-1"></i>
-                                        Recent Books with Highest Ratings
-                                    </div>
-                                    <div class="card-body">
-                                        <table id="TopBooks">
-                                            <thead>
-                                                <tr>
-                                                    <th>Title</th>
-                                                    <th>Year Released</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                {% for top_book in top_books %}
-                                                <tr>
-                                                    <td>{{ top_book.Title }}</td>
-                                                    <td>{{ top_book.Year }}</td>
-                                                </tr>
-                                                {% endfor %}
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-xl-6">
-                                <div class="card mb-4">
-                                    <div class="card-header">
-                                        <i class="fas fa-table me-1"></i>
-                                        Top Reviewing Users
-                                    </div>
-                                    <div class="card-body">
-                                        <table id="TopUsers">
-                                            <thead>
-                                                <tr>
-                                                    <th>Name</th>
-                                                    <th>Year Reviewed</th>
-                                                    <th>Numer of Reviews Placed</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                {% for top_user in top_users %}
-                                                <tr>
-                                                    <td>{{ top_user.Name }}</td>
-                                                    <td>{{ top_user.Year }}</td>
-                                                    <td>{{ top_user.NumReviews }}</td>
-                                                </tr>
-                                                {% endfor %}
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                            </div>
-                            <!-- <div class="col-xl-6">
-                                <div class="card mb-4">
-                                    <div class="card-header">
-                                        <i class="fas fa-chart-area me-1"></i>
-                                        Area Chart Example
-                                    </div>
-                                    <div class="card-body"><canvas id="myAreaChart" width="100%" height="40"></canvas></div>
-                                </div>
-                            </div>
-                            <div class="col-xl-6">
-                                <div class="card mb-4">
-                                    <div class="card-header">
-                                        <i class="fas fa-chart-bar me-1"></i>
-                                        Bar Chart Example
-                                    </div>
-                                    <div class="card-body"><canvas id="myBarChart" width="100%" height="40"></canvas></div>
-                                </div>
-                            </div> -->
-                        </div>
+
+                        <!-- Add new review -->
                         <div class="card mb-4">
                             <div class="card-header">
                                 <i class="fas fa-table me-1"></i>
-                                DataTable Example
+                                Add/Update Review for {{isbns}}
+                            </div>
+                            <div class="card-body">
+                                <table id="tables">
+                                    <thead>
+                                        <tr>
+                                            <th>ISBN</th>
+                                            <th>UserID</th>
+                                            <th>Date</th>
+                                            <th>StarRating</th>
+                                            <th>Text</th>
+                                            <th>Submit</th>
+                                            <th>Update</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        
+                                        <tr>
+                                            <form>
+                                                <td><input id="isbn" name="isbn" type="text" value={{isbns}}></td>
+                                                <td><input id="user_id" name="user_id" type="text" Type="text" value=""></td>
+                                                <td><input id="date" name="date" Type="date"></td>
+                                                <script>
+                                                    document.getElementById('date').value = new Date().toISOString().substring(0, 10);
+                                                </script>
+                                                <td><input id="starrating" name="startating" type="text" list="starratinglist"></td>
+                                                <datalist id="starratinglist">
+                                                    <option value="1">1</option>
+                                                    <option value="2">2</option>
+                                                    <option value="3">3</option>
+                                                    <option value="4">4</option>
+                                                    <option value="5">5</option>
+                                                </datalist>
+                                                <td><input id="text" name="text" type="text" value=""></td>
+                                                <th><input id="submit-review" type="button" class="btn btn-primary" value="Submit" onclick="insertreview()"></th>
+                                                <th><input id="update-review" type="button" class="btn btn-primary" value="Update" onclick="updatereview()"></th>
+                                                <script>
+                                                    function insertreview(){
+                                                        var isbn=document.getElementById("isbn").value;
+                                                        var user_id=document.getElementById("user_id").value;
+                                                        var date=document.getElementById("date").value;
+                                                        var starrating=document.getElementById("starrating").value;
+                                                        var text=document.getElementById("text").value;
+                                                        $.ajax({
+                                                            type: 'POST',
+                                                            url: '/insertreview/'+isbn+'/'+user_id+'/'+date+'/'+starrating+'/'+text,
+                                                            success: function (res) {
+                                                                console.log(res.response)
+                                                                location.reload();
+                                                            },
+                                                            error: function () {
+                                                                console.log('Error');
+                                                            }
+                                                        });
+                                                    }
+
+                                                    function updatereview(){
+                                                        var isbn=document.getElementById("isbn").value;
+                                                        var user_id=document.getElementById("user_id").value;
+                                                        var date=document.getElementById("date").value;
+                                                        var starrating=document.getElementById("starrating").value;
+                                                        var text=document.getElementById("text").value;
+                                                        $.ajax({
+                                                            type: 'POST',
+                                                            url: '/editreview/'+isbn+'/'+user_id+'/'+date+'/'+starrating+'/'+text,
+                                                            success: function (res) {
+                                                                console.log(res.response)
+                                                                location.reload();
+                                                            },
+                                                            error: function () {
+                                                                console.log('Error');
+                                                            }
+                                                        });
+                                                    }
+                                                </script>
+                                                <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+                                            </form>
+                                        </tr>
+                                        
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <i class="fas fa-table me-1"></i>
+                                {{isbns}} Reviews 
                             </div>
                             <div class="card-body">
                                 <table id="datatablesSimple">
                                     <thead>
                                         <tr>
-                                            <th>Cover</th>
                                             <th>ISBN</th>
-                                            <th>Title</th>
-                                            <th>Author</th>
-                                            <th>Publisher</th>
+                                            <th>UserID</th>
+                                            <th>Date</th>
+                                            <th>StarRating</th>
+                                            <th>Text</th>
+                                            <th>Edit</th>
+                                            <th>Delet</th>
                                         </tr>
                                     </thead>
                                     <tfoot>
                                         <tr>
                                             <th>ISBN</th>
-                                            <th>Title</th>
-                                            <th>Author</th>
-                                            <th>Cover</th>
-                                            <th>Publisher</th>
+                                            <th>UserId</th>
+                                            <th>Date</th>
+                                            <th>StarRating</th>
+                                            <th>Text</th>
+                                            <th>Edit</th>
+                                            <th>Delet</th>
                                         </tr>
                                     </tfoot>
                                     <tbody>
-                                        {% for book in books %}
+                                        {% for review in reviews %}
                                         <tr>
-                                            <td><img alt="Cover" src={{ book.ImageURL }} width=80/></td>
-                                            <td>{{ book.ISBN }}</td>
-                                            <td>{{ book.Title }}</td>
-                                            <td>{{ book.Author }}</td>
-                                            <td>{{ book.Publisher }}</td>
+                                            <td>{{ review.ISBN }}</td>
+                                            <td>{{ review.UserID }}</td>
+                                            <td>{{ review.Date }}</td>
+                                            <td>{{ review.StarRating }}</td>
+                                            <td>{{ review.Text }}</td>
+                                            <th><button type="button" data-isbn="{{review.ISBN}}" data-userid="{{review.UserID}}" data-date="{{review.Date}}" data-starrating="{{review.StarRating}}" data-text="{{review.Text}}" class="btn btn-primary editreview">Edit</button></th>
+                                            <th>
+                                                <button name="btnDelete" data-isbn="{{review.ISBN}}" data-userid="{{review.UserID}}" class="btn btn-primary remove deletereview" type="button">Delete</button>
+                                            </th>
                                         </tr>
                                         {% endfor %}
+                                        <script>
+                                            $(document).ready(function () {
+                                                $('.deletereview').click(function deletereview(){
+                                                    var deletereview = $(this);
+                                                    var isbn=deletereview.data('isbn');
+                                                    var user_id=deletereview.data('userid');
+                                                    alert("The review of UserID= "+user_id+" for the book isbn = "+isbn+" will be deleted!");
+                                                    $.ajax({
+                                                        type: 'POST',
+                                                        url: '/deletereview/'+isbn+'/'+user_id,
+                                                        success: function (res) {
+                                                            console.log(res.response)
+                                                            location.reload();
+                                                        },
+                                                        error: function () {
+                                                            console.log('Error');
+                                                        }
+                                                    });
+                                                });
+
+                                                $('.editreview').click(function editreview(){
+                                                    var editreview = $(this);
+                                                    var isbn=editreview.data('isbn');
+                                                    var user_id=editreview.data('userid');
+                                                    var date=editreview.data('date');
+                                                    var starrating=editreview.data('starrating');
+                                                    var text=editreview.data('text');
+                                                    
+                                                    document.getElementById('user_id').value = user_id;
+                                                    document.getElementById('date').value = date;
+                                                    document.getElementById('starrating').value = starrating;
+                                                    document.getElementById('text').value = text;
+                                                    alert("Please use above form to update review, then click Update");
+                                                });
+                                                
+                                            });
+                                        </script>
+
                                     </tbody>
                                 </table>
                             </div>
