@@ -39,6 +39,17 @@ def add():
     bb = db_helper.read_from_table("BorrowedBook")
     return jsonify({r[0]:str(r[1:]) for r in bb})
 
+
+@app.route("/search_book.html", methods=['GET', 'POST'])
+def search_book():
+    if request.method == "POST":
+        spbook = db_helper.fetch_spbook(request.values['title'])
+        #print(spbook)
+        data = {"status":True, "books":spbook}
+        return render_template("search_book.html", **data)
+    return render_template("search_book.html")
+
+  
 @app.route("/review")
 def reviewpage():
     '''Define reviewpage'''
@@ -83,5 +94,3 @@ def updatereview(isbn,user_id,date,starrating,text):
         result = {'success': False, 'response': 'Something went wrong'}
 
     return jsonify(result)
-
-

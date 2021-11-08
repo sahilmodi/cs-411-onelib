@@ -149,6 +149,15 @@ def delete_review(user_id, isbn):
     conn.close()
     return True
 
+def fetch_spbook(input_text):
+    conn = db.connect()
+    #print(input_text)
+    q = f"SELECT * FROM Book WHERE Title LIKE '%%{input_text}%%'"  # cuz python will interpret % as a printf-like format character
+    spbook = conn.execute(q)
+    # print(spbook)
+    conn.close()
+    return [r for r in spbook]
+
 def advanced_query_top_books():
     conn = db.connect()
     q = """
@@ -192,3 +201,4 @@ def advanced_query_top_users():
     """
     res = conn.execute(q)
     return [r for r in res]
+
