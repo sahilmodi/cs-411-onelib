@@ -7,6 +7,8 @@ from app import database as db_helper
 
 from flask import jsonify, render_template, request, flash
 
+from app.utils import render_template_with_nav
+
 @app.route("/")
 def homepage():
     books = db_helper.test()
@@ -15,8 +17,12 @@ def homepage():
     # advanced queries
     data["top_books"] = db_helper.advanced_query_top_books()
     data["top_users"] = db_helper.advanced_query_top_users()
-    print(data["top_books"])
-    return render_template("index.html", **data)
+    return render_template_with_nav("index.html", **data)
+
+
+@app.route("/index.html")
+def index():
+    return homepage()
 
 @app.route("/borrow_book.html", methods=['GET', 'POST'])
 def borrow_book():
@@ -29,7 +35,7 @@ def borrow_book():
     books = db_helper.get_rentable_books(0)
     borrowed_books = db_helper.get_borrowed_books(amount=25)
     data = {"books":books, "borrowed_books":borrowed_books}
-    return render_template("borrow_book.html", **data)
+    return render_template_with_nav("borrow_book.html", **data)
 
 
 
@@ -46,8 +52,8 @@ def search_book():
         spbook = db_helper.fetch_spbook(request.values['title'])
         #print(spbook)
         data = {"status":True, "books":spbook}
-        return render_template("search_book.html", **data)
-    return render_template("search_book.html")
+        return render_template_with_nav("search_book.html", **data)
+    return render_template_with_nav("search_book.html")
 
   
 @app.route("/review")
@@ -55,14 +61,14 @@ def reviewpage():
     '''Define reviewpage'''
     reviews = db_helper.fetch_allreview()
     isbns=842332251
-    return render_template("review.html",reviews=reviews,isbns=isbns)
+    return render_template_with_nav("review.html",reviews=reviews,isbns=isbns)
 
 @app.route("/review/<string:isbn>")
 def bookreviewpage(isbn):
     '''Define reviewpage'''
     reviews = db_helper.fetch_bookreview(isbn)
     isbns=isbn
-    return render_template("review.html",reviews=reviews,isbns=isbns)
+    return render_template_with_nav("review.html",reviews=reviews,isbns=isbns)
 
 @app.route("/insertreview/<string:isbn>/<int:user_id>/<string:date>/<int:starrating>/<string:text>", methods=['POST'])
 def insertreview(isbn,user_id,date,starrating,text):
