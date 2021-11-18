@@ -117,31 +117,6 @@ def update_review(isbn,user_id,date,starrating,text)->None:
     conn.close()
 
 
-def update_rent_librarybook(LibraryID: int, ISBN: str) -> None:
-    """
-    Update the Quantity after user rent a book
-
-    """
-    conn = db.connect()
-    Quantity = conn.execute('Select Quantity from LibraryBook where LibraryID = {} and ISBN="{}";'.format(LibraryID,ISBN))
-    BookQuantity=int(Quantity)
-    query = 'Update LibraryBook set Quantity = {} where LibraryID = {} and ISBN="{}";'.format(BookQuantity-1, LibraryID, ISBN)
-    conn.execute(query)
-    conn.close()
-
-def update_return_librarybook(LibraryID: int, ISBN: str) -> None:
-    """
-    Update the Quantity after user return a book
-
-    """
-    conn = db.connect()
-    Quantity = conn.execute('Select Quantity from LibraryBook where LibraryID = {} and ISBN="{}";'.format(LibraryID,ISBN))
-    BookQuantity=int(Quantity)
-    query = 'Update LibraryBook set Quantity = {} where LibraryID = {} and ISBN="{}";'.format(BookQuantity+1, LibraryID, ISBN)
-    conn.execute(query)
-    conn.close()
-
-
 def delete_review(user_id, isbn):
     conn = db.connect()
     q = f"DELETE FROM Review WHERE UserID = {user_id} AND ISBN LIKE '{isbn}'"

@@ -1,4 +1,3 @@
-import re
 from flask.helpers import url_for
 
 from werkzeug.utils import redirect

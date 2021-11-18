@@ -49,7 +49,7 @@
                                         <form action="" method="post">
                                             <input type="hidden" name="isbn" value={{ book.ISBN }}>
                                             <input type="hidden" name="library_id" value={{ book.LibraryID }}>
-                                            <input type="hidden" name="user_id" value=0>
+                                            <input type="hidden" name="user_id" value={{ user.UserID }}>
                                             <input type="hidden" name="return" value=0>
                                             <button name="btnBorrow" class="btn btn-primary" type="submit">Borrow</button>
                                         </form>
