@@ -46,7 +46,7 @@
                                     <td>{{ book.Name }}</td>
                                     <td>{{ book.Quantity }}</td>
                                     <td>
-                                        <form action="" method="post">
+                                        <form action="" method="post" onsubmit="return confirm('{{ confirm_msg }}')">
                                             <input type="hidden" name="isbn" value={{ book.ISBN }}>
                                             <input type="hidden" name="library_id" value={{ book.LibraryID }}>
                                             <input type="hidden" name="user_id" value={{ user.UserID }}>
@@ -76,6 +76,7 @@
                                     <th>ISBN</th>
                                     <th>Title</th>
                                     <th>Due Date</th>
+                                    <th>Return Date</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -87,15 +88,19 @@
                                     <td>{{ book.ISBN }}</td>
                                     <td>{{ book.Title }}</td>
                                     <td>{{ book.DueDate }}</td>
-                                    <td>
-                                        <form action="" method="post">
-                                            <input type="hidden" name="isbn" value={{ book.ISBN }}>
-                                            <input type="hidden" name="library_id" value={{ book.LibraryID }}>
-                                            <input type="hidden" name="user_id" value={{ book.UserID }}>
-                                            <input type="hidden" name="return" value=1>
-                                            <button class="btn btn-primary" type="submit">Return</button>
-                                        </form>
-                                    </td>
+                                    {% if book.ReturnDate is none %}
+                                        <td>
+                                            <form action="" method="post">
+                                                <input type="hidden" name="isbn" value={{ book.ISBN }}>
+                                                <input type="hidden" name="library_id" value={{ book.LibraryID }}>
+                                                <input type="hidden" name="user_id" value={{ book.UserID }}>
+                                                <input type="hidden" name="return" value=1>
+                                                <button class="btn btn-primary" type="submit">Return</button>
+                                            </form>
+                                        </td>
+                                    {% else %}
+                                    <td>{{ book.ReturnDate }}</td>
+                                    {% endif %}
                                 </tr>
                                 {% endfor %}
                             </tbody>

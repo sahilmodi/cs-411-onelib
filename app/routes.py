@@ -7,6 +7,7 @@ from app import database as db_helper
 from flask import jsonify, render_template, request, flash
 
 from app.utils import render_template_with_nav
+import app.user as user
 
 @app.route("/")
 def homepage():
@@ -31,9 +32,15 @@ def borrow_book():
         else:
             db_helper.return_book(request.values['user_id'], request.values['library_id'], request.values['isbn'])
         redirect(url_for("borrow_book"))
+    
     books = db_helper.get_rentable_books(0)
-    borrowed_books = db_helper.get_borrowed_books(amount=25)
+    borrowed_books = db_helper.get_borrowed_books(user_id=user.get_current_user_id(), amount=25)
     data = {"books":books, "borrowed_books":borrowed_books}
+
+    fee, score = db_helper.get_fee_score(user_id=user.get_current_user_id())
+    data['confirm_msg'] = f"You have a library score of {score:0.2f} and owe ${fee:0.2f}."
+    if score < 0.2 or fee > 10:
+        data['confirm_msg'] += " Due date automatically reduced to 1 week."
     return render_template_with_nav("borrow_book.html", **data)
 
 

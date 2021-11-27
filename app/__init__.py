@@ -1,8 +1,11 @@
 import os
 import sqlalchemy
 from yaml import load, Loader
-from flask import Flask, jsonify
 from pathlib import Path
+
+from flask import Flask, jsonify
+from flask_bcrypt import Bcrypt
+from flask_login import LoginManager
 
 
 app = Flask(__name__)
@@ -31,7 +34,11 @@ def init_connect_engine(gcloud=True):
 
 db = init_connect_engine(gcloud=False)
 
-from app import routes, user
+# bcrypt = Bcrypt(app)
+# login_manager = LoginManager(app)
+
+from app import routes, user, database
 
 # Change once we have a working login page
 user.set_current_user_id(0)
+database.seed_borrowed_books(user_id=0)
