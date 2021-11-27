@@ -151,10 +151,9 @@ def delete_review(user_id, isbn):
 
 def fetch_spbook(input_text):
     conn = db.connect()
-    #print(input_text)
-    q = f"SELECT * FROM Book WHERE Title LIKE '%%{input_text}%%'"  # cuz python will interpret % as a printf-like format character
+    q = f"SELECT * FROM Book WHERE Title LIKE '%%{input_text}%%' OR Author LIKE '%%{input_text}%%' OR Publisher LIKE '%%{input_text}%%' OR ISBN LIKE '%%{input_text}%%' " 
+    # cuz python will interpret % as a printf-like format character
     spbook = conn.execute(q)
-    # print(spbook)
     conn.close()
     return [r for r in spbook]
 
