@@ -62,22 +62,6 @@ def read_from_table(table, amount=5):
         res = conn.execute(f"SELECT * FROM {table}").fetchmany(amount)
     return [r for r in res]
 
-def fetch_allreview() ->dict:
-    conn = db.connect()
-    query='SELECT * FROM Review where ISBN LIKE "842332251";'
-    query_results = conn.execute(query).fetchall()
-    conn.close()
-    allreview = []
-    for result in query_results:
-        item = {
-            "ISBN": result[0],
-            "UserID": result[1],
-            "Date": result[2],
-            "StarRating": result[3],
-            "Text": result[4]
-        }
-        allreview.append(item)
-    return allreview
 
 def fetch_bookreview(isbn) ->dict:
     conn = db.connect()
@@ -95,6 +79,35 @@ def fetch_bookreview(isbn) ->dict:
         }
         bookreview.append(item)
     return bookreview
+
+def fetch_bookinfo(isbn) ->dict:
+    conn = db.connect()
+    query='SELECT * FROM Book where ISBN LIKE "{}";'.format(isbn)
+    query_results = conn.execute(query).fetchall()
+    conn.close()
+    bookinfo = []
+    for result in query_results:
+        item = {
+            "ISBN": result[0],
+            "Title": result[1],
+            "Author": result[2],
+            "ImageURl": result[3],
+            "Publisher": result[4]
+        }
+        bookinfo.append(item)
+    return bookinfo
+
+def fetch_bookrate(isbn):
+    conn = db.connect()
+    query='SELECT ROUND(AVG(StarRating),1) FROM Review where ISBN LIKE "{}";'.format(isbn)
+    query_results = conn.execute(query)
+    conn.close()
+    bookrate=[]
+    for result in query_results:
+        item = {"rate":result[0]}
+    bookrate.append(item)
+    return bookrate
+
 
 def remove_review(isbn,user_id) -> None:
     """ remove entries based on ISBN and UserId """

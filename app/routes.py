@@ -53,16 +53,20 @@ def search_book():
 @app.route("/review")
 def reviewpage():
     '''Define reviewpage'''
-    reviews = db_helper.fetch_allreview()
+    reviews = db_helper.fetch_bookreview(842332251)
     isbns=842332251
-    return render_template("review.html",reviews=reviews,isbns=isbns)
+    bookinfo=db_helper.fetch_bookinfo(842332251)
+    bookrate=db_helper.fetch_bookrate(842332251)
+    return render_template("review.html",reviews=reviews,isbns=isbns,bookinfo=bookinfo,bookrate=bookrate)
 
 @app.route("/review/<string:isbn>")
 def bookreviewpage(isbn):
     '''Define reviewpage'''
     reviews = db_helper.fetch_bookreview(isbn)
+    bookinfo=db_helper.fetch_bookinfo(isbn)
     isbns=isbn
-    return render_template("review.html",reviews=reviews,isbns=isbns)
+    bookrate=db_helper.fetch_bookrate(isbn)
+    return render_template("review.html",reviews=reviews,isbns=isbns,bookinfo=bookinfo,bookrate=bookrate)
 
 @app.route("/insertreview/<string:isbn>/<int:user_id>/<string:date>/<int:starrating>/<string:text>", methods=['POST'])
 def insertreview(isbn,user_id,date,starrating,text):
