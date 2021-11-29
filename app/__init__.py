@@ -4,8 +4,8 @@ from yaml import load, Loader
 from pathlib import Path
 
 from flask import Flask, jsonify
-from flask_bcrypt import Bcrypt
-from flask_login import LoginManager
+# from flask_bcrypt import Bcrypt
+# from flask_login import LoginManager
 
 
 app = Flask(__name__)

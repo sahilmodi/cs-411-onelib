@@ -1,5 +1,5 @@
 DELIMITER //
-DROP PROCEDURE IF EXISTS CalculateLibraryFeeAndScores \\
+DROP PROCEDURE IF EXISTS CalculateLibraryFeeAndScores //
 CREATE PROCEDURE CalculateLibraryFeeAndScores(IN currentUser INT, OUT total_late_fee REAL, OUT score REAL)
 BEGIN
     DECLARE due_date DATE;
@@ -48,8 +48,8 @@ END //
 DELIMITER ;
 
 
-DELIMITER \\
-DROP TRIGGER IF EXISTS CheckoutTrigger \\
+DELIMITER //
+DROP TRIGGER IF EXISTS CheckoutTrigger //
 CREATE TRIGGER CheckoutTrigger
 BEFORE INSERT ON BorrowedBook
 FOR EACH ROW
@@ -58,5 +58,5 @@ BEGIN
     IF @late_fee > 10.00 OR @score < 0.2 THEN
 		SET new.DueDate = DATE_ADD(CURDATE(), INTERVAL 7 DAY);
     END IF;
-END \\
+END //
 DELIMITER ;
