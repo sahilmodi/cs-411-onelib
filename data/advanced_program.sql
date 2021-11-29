@@ -10,7 +10,8 @@ BEGIN
     
     DECLARE fee REAL default 0;
     DECLARE checked_out_books REAL;
-    DECLARE returned_books REAL;
+    DECLARE returned_ontime_books REAL;
+    DECLARE unreturned_books REAL;
 
     DECLARE bb_cur CURSOR FOR SELECT DueDate, LateFee, Buyable, ReturnDate FROM BorrowedBook NATURAL JOIN LibraryBook WHERE UserID = currentUser;
 
@@ -39,11 +40,19 @@ BEGIN
 	INTO checked_out_books;
 
     SELECT SUM(t.cnt) FROM (
-        SELECT COUNT(*) cnt FROM BorrowedBook WHERE UserID = currentUser and ReturnDate <= DueDate GROUP BY YEAR(DueDate) order by YEAR(DueDate) DESC LIMIT 3) as t
-	INTO returned_books;
+        SELECT COUNT(*) cnt FROM BorrowedBook WHERE UserID = currentUser AND ReturnDate <= DueDate GROUP BY YEAR(DueDate) order by YEAR(DueDate) DESC LIMIT 3) as t
+	INTO returned_ontime_books;
+
+    SELECT SUM(t.cnt) FROM (
+        SELECT COUNT(*) cnt FROM BorrowedBook WHERE UserID = currentUser AND CURDATE() > DueDate AND ReturnDate is NULL GROUP BY YEAR(DueDate) order by YEAR(DueDate) DESC LIMIT 5) as t
+	INTO unreturned_books;
+
+    IF unreturned_books is NULL THEN
+        SET unreturned_books = 0;
+    END IF;
 
     SELECT fee INTO total_late_fee;
-    SELECT returned_books / checked_out_books INTO score;
+    SELECT GREATEST(returned_ontime_books / checked_out_books - unreturned_books, 0) INTO score;
 END //
 DELIMITER ;
 
