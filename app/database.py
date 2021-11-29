@@ -23,10 +23,9 @@ def get_rentable_books(library_id, amount=10):
         res = conn.execute(f"SELECT * FROM LibraryBook NATURAL JOIN Library NATURAL JOIN Book WHERE LibraryID={library_id}").fetchmany(amount)
     return [b for b in res]
 
-def get_borrowed_books(user_id=None, amount=10):
-    query = "SELECT User.Name UserName, UserID, DueDate, ImageURL, Library.Name LibraryName, Title, Author, ISBN, LibraryID FROM BorrowedBook NATURAL JOIN Book NATURAL JOIN User JOIN Library USING (LibraryID)"
-    if user_id is not None:
-        query += f" WHERE UserID={user_id}"
+def get_borrowed_books(user_id, amount=10):
+    query = "SELECT User.Name UserName, UserID, DueDate, ReturnDate, ImageURL, Library.Name LibraryName, Title, Author, ISBN, LibraryID FROM BorrowedBook NATURAL JOIN Book NATURAL JOIN User JOIN Library USING (LibraryID)"
+    query += f" WHERE UserID={user_id}"
     with db.begin() as conn:
         res = conn.execute(query)
     return [r for r in res]
@@ -41,7 +40,7 @@ def checkout_book(user_id, library_id, isbn):
     if quantity == 0:
         return False
     due_date = datetime.datetime.today().date() + datetime.timedelta(days=time_limit_days)
-    q = f"Insert INTO BorrowedBook VALUES ({user_id}, {library_id}, '{isbn}', '{due_date}')"
+    q = f"Insert INTO BorrowedBook VALUES ({user_id}, {library_id}, '{isbn}', '{due_date}', NULL)"
     print(q)
     conn.execute(q)
     conn.execute(f"UPDATE LibraryBook SET Quantity = Quantity-1 WHERE LibraryID={library_id} AND ISBN LIKE '{isbn}'")
@@ -50,11 +49,25 @@ def checkout_book(user_id, library_id, isbn):
 
 def return_book(user_id, library_id, isbn):
     conn = db.connect()
-    conn.execute(f"DELETE FROM BorrowedBook WHERE UserID={user_id} AND LibraryID={library_id} AND ISBN LIKE '{isbn}'")
+    conn.execute(f"UPDATE BorrowedBook SET ReturnDate = '{datetime.datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')}' WHERE UserID={user_id} AND LibraryID={library_id} AND ISBN LIKE '{isbn}'")
     conn.execute(f"UPDATE LibraryBook SET Quantity = Quantity+1 WHERE LibraryID={library_id} AND ISBN LIKE '{isbn}'")
+
     conn.close()
     return True
 
+def get_fee_score(user_id):
+    with db.begin() as conn:
+        conn.execute(f"CALL CalculateLibraryFeeAndScores({user_id}, @total_fee, @score)")
+        r = conn.execute("SELECT @total_fee, @score").fetchone()
+    fee, score = r
+    return fee, score
+
+def seed_borrowed_books(user_id):
+    with db.begin() as conn:
+        conn.execute(f"TRUNCATE BorrowedBook")
+        conn.execute(f"INSERT INTO BorrowedBook VALUES ({user_id}, 0, '019509199X', '2021-12-16', '2021-11-26')")
+        conn.execute(f"INSERT INTO BorrowedBook VALUES ({user_id}, 0, '031202164X', '2021-12-11', '2021-11-26')")
+        conn.execute(f"INSERT INTO BorrowedBook VALUES ({user_id}, 0, '1551667320', '2021-11-05', NULL)")
 
 def read_from_table(table, amount=5):
     assert table in tables
@@ -126,31 +139,6 @@ def insert_new_review(isbn,user_id,date,starrating,text)->None:
 def update_review(isbn,user_id,date,starrating,text)->None:
     conn = db.connect()
     query='Update Review set Date="{}", StarRating={}, Text="{}" where ISBN LIKE "{}" and UserID={};'.format(date,starrating,text,isbn,user_id)
-    conn.execute(query)
-    conn.close()
-
-
-def update_rent_librarybook(LibraryID: int, ISBN: str) -> None:
-    """
-    Update the Quantity after user rent a book
-
-    """
-    conn = db.connect()
-    Quantity = conn.execute('Select Quantity from LibraryBook where LibraryID = {} and ISBN="{}";'.format(LibraryID,ISBN))
-    BookQuantity=int(Quantity)
-    query = 'Update LibraryBook set Quantity = {} where LibraryID = {} and ISBN="{}";'.format(BookQuantity-1, LibraryID, ISBN)
-    conn.execute(query)
-    conn.close()
-
-def update_return_librarybook(LibraryID: int, ISBN: str) -> None:
-    """
-    Update the Quantity after user return a book
-
-    """
-    conn = db.connect()
-    Quantity = conn.execute('Select Quantity from LibraryBook where LibraryID = {} and ISBN="{}";'.format(LibraryID,ISBN))
-    BookQuantity=int(Quantity)
-    query = 'Update LibraryBook set Quantity = {} where LibraryID = {} and ISBN="{}";'.format(BookQuantity+1, LibraryID, ISBN)
     conn.execute(query)
     conn.close()
 
