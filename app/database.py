@@ -72,7 +72,7 @@ def seed_borrowed_books(user_id):
 def read_from_table(table, amount=5):
     assert table in tables
     with db.begin() as conn:
-        res = conn.execute(f"SELECT * FROM {table}").fetchmany(amount)
+        res = conn.execute(f"SELECT * FROM {table} LIMIT {amount}").fetchall()
     return [r for r in res]
 
 

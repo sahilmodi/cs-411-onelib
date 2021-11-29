@@ -13,16 +13,21 @@ import app.user as user
 def homepage():
     books = db_helper.test()
     data = {"status":True, "books":books}
-
-    # advanced queries
-    data["top_books"] = db_helper.advanced_query_top_books()
-    data["top_users"] = db_helper.advanced_query_top_users()
     return render_template_with_nav("index.html", **data)
 
 
 @app.route("/index.html")
 def index():
     return homepage()
+
+
+@app.route("/top_charts.html")
+def top_charts():
+    data = {}
+    data["top_books"] = db_helper.advanced_query_top_books()
+    data["top_users"] = db_helper.advanced_query_top_users()
+    return render_template_with_nav("top_charts.html", **data)
+
 
 @app.route("/borrow_book.html", methods=['GET', 'POST'])
 def borrow_book():
