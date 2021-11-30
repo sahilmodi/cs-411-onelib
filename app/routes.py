@@ -70,7 +70,7 @@ def search_book():
 def search_library():
     if request.method == "POST":
         splibrary = db_helper.fetch_splibrary(request.values['zipcode'])
-        data = {"status":True, "books":splibrary}
+        data = {"status":True, "libraries":splibrary}
         return render_template("search_library.html", **data)
     return render_template("search_library.html")
 
