@@ -10,90 +10,109 @@
         <link href="{{ url_for('static', filename='css/styles.css') }}" rel="stylesheet" />
         <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/js/all.min.js" crossorigin="anonymous"></script>
     </head>
-    <body>
+    <body class="sb-nav-fixed">
+    
+    <div id="nav"></div>
 
-    <div class="card mb-4">
-        <div class="card-header">
-            <i class="fas fa-table me-1"></i>
-            Books Available to Borrow
-        </div>
-        <div class="card-body">
-            <table id="AvailableBooks">
-                <thead>
-                    <tr>
-                        <th>Cover</th>
-                        <th>ISBN</th>
-                        <th>Title</th>
-                        <th>Author</th>
-                        <th>Publisher</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for book in books %}
-                    <tr>
-                        <td><img alt="Cover" src={{ book.ImageURL }} width=80/></td>
-                        <td>{{ book.ISBN }}</td>
-                        <td>{{ book.Title }}</td>
-                        <td>{{ book.Author }}</td>
-                        <td>{{ book.Name }}</td>
-                        <td>{{ book.Quantity }}</td>
-                        <td>
-                            <form action="" method="post">
-                                <input type="hidden" name="isbn" value={{ book.ISBN }}>
-                                <input type="hidden" name="library_id" value={{ book.LibraryID }}>
-                                <input type="hidden" name="user_id" value=0>
-                                <input type="hidden" name="return" value=0>
-                                <button name="btnBorrow" class="btn btn-primary" type="submit">Borrow</button>
-                            </form>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+    <div id="layoutSidenav">
+        <div id="nav-sidebar"></div>
+
+        <div id="layoutSidenav_content">
+            <main>
+
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <i class="fas fa-table me-1"></i>
+                        Books Available to Borrow
+                    </div>
+                    <div class="card-body">
+                        <table id="AvailableBooks">
+                            <thead>
+                                <tr>
+                                    <th>Cover</th>
+                                    <th>ISBN</th>
+                                    <th>Title</th>
+                                    <th>Author</th>
+                                    <th>Publisher</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for book in books %}
+                                <tr>
+                                    <td><img alt="Cover" src={{ book.ImageURL }} width=80/></td>
+                                    <td>{{ book.ISBN }}</td>
+                                    <td>{{ book.Title }}</td>
+                                    <td>{{ book.Author }}</td>
+                                    <td>{{ book.Name }}</td>
+                                    <td>{{ book.Quantity }}</td>
+                                    <td>
+                                        <form action="" method="post" onsubmit="return confirm('{{ confirm_msg }}')">
+                                            <input type="hidden" name="isbn" value={{ book.ISBN }}>
+                                            <input type="hidden" name="library_id" value={{ book.LibraryID }}>
+                                            <input type="hidden" name="user_id" value={{ user.UserID }}>
+                                            <input type="hidden" name="return" value=0>
+                                            <button name="btnBorrow" class="btn btn-primary" type="submit">Borrow</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <i class="fas fa-table me-1"></i>
+                        Checked Out Books
+                    </div>
+                    <div class="card-body">
+                        <table id="BorrowedBooks">
+                            <thead>
+                                <tr>
+                                    <th>User Name</th>
+                                    <th>Library Name</th>
+                                    <th>Cover</th>
+                                    <th>ISBN</th>
+                                    <th>Title</th>
+                                    <th>Due Date</th>
+                                    <th>Return Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for book in borrowed_books %}
+                                <tr>
+                                    <td>{{ book.UserName }}</td>
+                                    <td>{{ book.LibraryName }}</td>
+                                    <td><img alt="Cover" src={{ book.ImageURL }} width=80/></td>
+                                    <td>{{ book.ISBN }}</td>
+                                    <td>{{ book.Title }}</td>
+                                    <td>{{ book.DueDate }}</td>
+                                    {% if book.ReturnDate is none %}
+                                        <td>
+                                            <form action="" method="post">
+                                                <input type="hidden" name="isbn" value={{ book.ISBN }}>
+                                                <input type="hidden" name="library_id" value={{ book.LibraryID }}>
+                                                <input type="hidden" name="user_id" value={{ book.UserID }}>
+                                                <input type="hidden" name="return" value=1>
+                                                <button class="btn btn-primary" type="submit">Return</button>
+                                            </form>
+                                        </td>
+                                    {% else %}
+                                    <td>{{ book.ReturnDate }}</td>
+                                    {% endif %}
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+        
+            </main>
         </div>
     </div>
 
-    <div class="card mb-4">
-        <div class="card-header">
-            <i class="fas fa-table me-1"></i>
-            Checked Out Books
-        </div>
-        <div class="card-body">
-            <table id="BorrowedBooks">
-                <thead>
-                    <tr>
-                        <th>User Name</th>
-                        <th>Library Name</th>
-                        <th>Cover</th>
-                        <th>ISBN</th>
-                        <th>Title</th>
-                        <th>Due Date</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for book in borrowed_books %}
-                    <tr>
-                        <td>{{ book.UserName }}</td>
-                        <td>{{ book.LibraryName }}</td>
-                        <td><img alt="Cover" src={{ book.ImageURL }} width=80/></td>
-                        <td>{{ book.ISBN }}</td>
-                        <td>{{ book.Title }}</td>
-                        <td>{{ book.DueDate }}</td>
-                        <td>
-                            <form action="" method="post">
-                                <input type="hidden" name="isbn" value={{ book.ISBN }}>
-                                <input type="hidden" name="library_id" value={{ book.LibraryID }}>
-                                <input type="hidden" name="user_id" value={{ book.UserID }}>
-                                <input type="hidden" name="return" value=1>
-                                <button class="btn btn-primary" type="submit">Return</button>
-                            </form>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-    </div>
+    
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
     <script src="{{ url_for('static', filename='js/scripts.js') }}"></script>

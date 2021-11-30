@@ -1,13 +1,20 @@
 import os
 import sqlalchemy
 from yaml import load, Loader
+from pathlib import Path
+
 from flask import Flask, jsonify
+# from flask_bcrypt import Bcrypt
+# from flask_login import LoginManager
 
 
 app = Flask(__name__)
 app.secret_key = "super secret key"
 
-def init_connect_engine():
+def init_connect_engine(gcloud=True):
+    if not gcloud:
+        pool = sqlalchemy.create_engine("mysql+pymysql://root:onelib@127.0.0.1:3306/onelib")
+        return pool
     if os.environ.get("GAE_ENV") != "standard":
         variables = load(open("app.yaml"), Loader=Loader)
         env_variables = variables["env_variables"]
@@ -25,6 +32,13 @@ def init_connect_engine():
     )
     return pool
 
-db = init_connect_engine()
+db = init_connect_engine(gcloud=False)
 
-from app import routes
+# bcrypt = Bcrypt(app)
+# login_manager = LoginManager(app)
+
+from app import routes, user, database
+
+# Change once we have a working login page
+user.set_current_user_id(0)
+database.seed_borrowed_books(user_id=0)
