@@ -61,10 +61,18 @@ def add():
 def search_book():
     if request.method == "POST":
         spbook = db_helper.fetch_spbook(request.values['title'])
-        #print(spbook)
         data = {"status":True, "books":spbook}
         return render_template_with_nav("search_book.html", **data)
     return render_template_with_nav("search_book.html")
+
+
+@app.route("/search_library.html", methods=['GET', 'POST'])
+def search_library():
+    if request.method == "POST":
+        splibrary = db_helper.fetch_splibrary(request.values['zipcode'])
+        data = {"status":True, "books":splibrary}
+        return render_template("search_library.html", **data)
+    return render_template("search_library.html")
 
   
 @app.route("/review")

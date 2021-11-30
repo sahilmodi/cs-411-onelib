@@ -159,6 +159,13 @@ def fetch_spbook(input_text):
     conn.close()
     return [r for r in spbook]
 
+def fetch_splibrary(input_text):
+    conn = db.connect()
+    q = f"SELECT * FROM Library WHERE Zipcode LIKE '%%{input_text}%%'" 
+    splibrary = conn.execute(q)
+    conn.close()
+    return [r for r in splibrary]
+
 def advanced_query_top_books():
     conn = db.connect()
     q = """
