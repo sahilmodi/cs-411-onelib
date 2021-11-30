@@ -40,5 +40,5 @@ db = init_connect_engine(gcloud=False)
 from app import routes, user, database
 
 # Change once we have a working login page
-user.set_current_user_id(0)
+# user.set_current_user_id(0)
 database.seed_borrowed_books(user_id=0)

@@ -4,22 +4,70 @@ from werkzeug.utils import redirect
 from app import app
 from app import database as db_helper
 
-from flask import jsonify, render_template, request, flash
+from flask import jsonify, render_template, request, flash, session
 
 from app.utils import render_template_with_nav
 import app.user as user
 
-@app.route("/")
+@app.route('/register', methods=['post','get'])
+def register():
+    error=None
+    success=None
+    if request.method == 'POST':
+        firstname = request.form.get('firstname')
+        lastname = request.form.get('lastname')
+        email = request.form.get('email')
+        password = request.form.get('password')
+        confirmpassword = request.form.get('confirmpassword')
+
+        if len(firstname) < 2: 
+            error = "Firstname is too short"
+        elif len(password) < 6:
+            error = "Password is too short"
+        elif password != confirmpassword:
+            error = "Passwords do not match"
+        # else:
+            # db_helper.add
+            # query = "INSERT INTO User(id,firstname,lastname,email,password) VALUES (NULL, %s, %s, %s, %s)"
+            # cursor.execute(query, (firstname,lastname,email,password))
+            # success = "You account has been created"
+
+    return render_template('register.html',error=error,msg=success)
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    email=request.form.get('email')
+    password = request.form.get('password')
+    u = user.login(email, password)
+    if u is not None:
+        if 'current_url' in session:
+            print("Redirecting to", session.get('current_url'))
+            return redirect(session.get('current_url'))
+        return homepage()
+    else:
+        return render_template('login.html')
+
+
 def homepage():
-    books = db_helper.test()
-    data = {"status":True, "books":books}
-    return render_template_with_nav("index.html", **data)
+    return redirect("/search_book.html")
+
+def check_login(url):
+    if user.get_current_user_id() is None:
+        session['current_url'] = url
+        return redirect("/login")
+    return None
+
+
+@app.route("/")
+def base():
+    if user.get_current_user_id() is not None:
+        return homepage()
+    return login()
 
 
 @app.route("/index.html")
 def index():
-    return homepage()
-
+    return base()
 
 @app.route("/top_charts.html")
 def top_charts():
@@ -31,62 +79,79 @@ def top_charts():
 
 @app.route("/borrow_book.html", methods=['GET', 'POST'])
 def borrow_book():
+    reload = check_login(request.path)
+    if reload:
+        return reload
+
+    if request.method == "POST":
+        db_helper.return_book(request.values['user_id'], request.values['library_id'], request.values['isbn'])
+    
+    borrowed_books = db_helper.get_borrowed_books(user_id=user.get_current_user_id())
+    data = {"borrowed_books":borrowed_books}
+    return render_template_with_nav("borrow_book.html", **data)
+
+
+@app.route("/search_book.html", methods=['GET', 'POST'])
+def search_book():
+    reload = check_login(request.path)
+    if reload:
+        return reload
+
+    data = {}
+    if request.method == "POST":
+        text = request.values['text']
+        title = 'title' in request.values
+        author = 'author' in request.values
+        publisher = 'publisher' in request.values
+        isbn = 'isbn' in request.values
+        buyable = 'buyable' in request.values
+        spbook = db_helper.fetch_spbook(text, title, author, publisher, isbn, buyable)
+        data["books"] = spbook
+    
+    data['sample'] = db_helper.test()
+    return render_template_with_nav("search_book.html", **data)
+
+
+@app.route("/book/<string:isbn>", methods=['GET', 'POST'])
+def book_info(isbn):
+    reload = check_login(request.path)
+    if reload:
+        return reload
+
+    u = user.get_current_user()
+    
     if request.method == "POST":
         if int(request.values['return']) == 0:
             db_helper.checkout_book(request.values['user_id'], request.values['library_id'], request.values['isbn'])
         else:
             db_helper.return_book(request.values['user_id'], request.values['library_id'], request.values['isbn'])
-        redirect(url_for("borrow_book"))
-    
-    books = db_helper.get_rentable_books(0)
-    borrowed_books = db_helper.get_borrowed_books(user_id=user.get_current_user_id(), amount=25)
-    data = {"books":books, "borrowed_books":borrowed_books}
+        # redirect(f"/book/{request.values['isbn']}")
 
-    fee, score = db_helper.get_fee_score(user_id=user.get_current_user_id())
+    data = {}
+    fee, score = db_helper.get_fee_score(user_id=u.UserID)
     data['confirm_msg'] = f"You have a library score of {score:0.2f} and owe ${fee:0.2f}."
     if score < 0.2 or fee > 10:
-        data['confirm_msg'] += " Due date automatically reduced to 1 week."
-    return render_template_with_nav("borrow_book.html", **data)
+        data['confirm_msg'] += " Due date will automatically be reduced to 1 week."
+    data['confirm_msg'] += ' Proceed with checkout?'
+    
+    data['nearby_libraries'] = db_helper.fetch_splibrary(isbn, u.Zipcode)
+    data['book'] = db_helper.fetch_bookinfo(isbn)[0]
+    data['rate'] = db_helper.fetch_bookrate(isbn)[0]
 
-
-
-@app.route("/add")
-def add():
-    db_helper.add_borrowed_book(0, 0, "019509199X")
-    bb = db_helper.read_from_table("BorrowedBook")
-    return jsonify({r[0]:str(r[1:]) for r in bb})
-
-
-@app.route("/search_book.html", methods=['GET', 'POST'])
-def search_book():
-    if request.method == "POST":
-        spbook = db_helper.fetch_spbook(request.values['title'])
-        data = {"status":True, "books":spbook}
-        return render_template_with_nav("search_book.html", **data)
-    return render_template_with_nav("search_book.html")
-
-
-@app.route("/search_library.html", methods=['GET', 'POST'])
-def search_library():
-    if request.method == "POST":
-        splibrary = db_helper.fetch_splibrary(request.values['zipcode'])
-        data = {"status":True, "books":splibrary}
-        return render_template("search_library.html", **data)
-    return render_template("search_library.html")
+    data['borrowed_books'] = db_helper.get_borrowed_books(user_id=u.UserID, amount=25)
+    return render_template_with_nav("book_info.html", **data)
 
   
 @app.route("/review")
 def reviewpage():
-    '''Define reviewpage'''
-    reviews = db_helper.fetch_bookreview(842332251)
-    isbns=842332251
-    bookinfo=db_helper.fetch_bookinfo(842332251)
-    bookrate=db_helper.fetch_bookrate(842332251)
-    return render_template_with_nav("review.html",reviews=reviews,isbns=isbns,bookinfo=bookinfo,bookrate=bookrate)
-
+    return redirect("/review/842332251")
+    
 @app.route("/review/<string:isbn>")
 def bookreviewpage(isbn):
-    '''Define reviewpage'''
+    reload = check_login(request.path)
+    if reload:
+        return reload
+
     reviews = db_helper.fetch_bookreview(isbn)
     bookinfo=db_helper.fetch_bookinfo(isbn)
     isbns=isbn

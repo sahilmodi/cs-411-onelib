@@ -3,6 +3,7 @@ from app import user
 
 def render_template_with_nav(file, **kwargs):
     u = user.get_current_user()
+    assert u is not None
     sidebar = render_template("sidebar.html", **kwargs, user=u)
     nav = render_template("nav.html", **kwargs, user=u)
     

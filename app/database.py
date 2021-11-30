@@ -39,9 +39,11 @@ def checkout_book(user_id, library_id, isbn):
     quantity, time_limit_days = res
     if quantity == 0:
         return False
-    due_date = datetime.datetime.today().date() + datetime.timedelta(days=time_limit_days)
-    q = f"Insert INTO BorrowedBook VALUES ({user_id}, {library_id}, '{isbn}', '{due_date}', NULL)"
-    print(q)
+    if time_limit_days is None:
+        q = f"Insert INTO BorrowedBook VALUES ({user_id}, {library_id}, '{isbn}', NULL, NULL)"
+    else:
+        due_date = datetime.datetime.today().date() + datetime.timedelta(days=time_limit_days)
+        q = f"Insert INTO BorrowedBook VALUES ({user_id}, {library_id}, '{isbn}', '{due_date}', NULL)"
     conn.execute(q)
     conn.execute(f"UPDATE LibraryBook SET Quantity = Quantity-1 WHERE LibraryID={library_id} AND ISBN LIKE '{isbn}'")
     conn.close()
@@ -150,18 +152,39 @@ def delete_review(user_id, isbn):
     conn.close()
     return True
 
-def fetch_spbook(input_text):
+def fetch_spbook(text, title, author, publisher, isbn, buyable, amount=100):
     conn = db.connect()
-    #print(input_text)
-    q = f"SELECT * FROM Book WHERE Title LIKE '%%{input_text}%%'"  # cuz python will interpret % as a printf-like format character
-    spbook = conn.execute(q)
-    # print(spbook)
-    conn.close()
-    return [r for r in spbook]
 
-def fetch_splibrary(input_text):
+    q = "SELECT * FROM Book WHERE"
+    text_search = []
+    if title:
+        text_search.append(f"Title LIKE '%%{text}%%'")
+    if isbn:
+        text_search.append(f"ISBN LIKE '%%{text}%%'")
+    if author:
+        text_search.append(f"Author LIKE '%%{text}%%'")
+    if publisher:
+        text_search.append(f"Publisher LIKE '%%{text}%%'")
+    
+    text_search = " OR ".join(text_search)
+    q = f"{q} ({text_search}) LIMIT {amount}"
+
+    spbook = conn.execute(q)
+    spbook = [r for r in spbook]
+
+    if buyable:
+        q = "SELECT DISTINCT ISBN FROM LibraryBook WHERE Buyable"
+        isbns = conn.execute(q)
+        isbns = [r for r in isbns]
+        valid_isbns = {i.ISBN for i in isbns}
+        spbook = [r for r in spbook if r.ISBN in valid_isbns]
+    
+    conn.close()
+    return spbook
+
+def fetch_splibrary(isbn, zipcode):
     conn = db.connect()
-    q = f"SELECT * FROM Library WHERE Zipcode LIKE '%%{input_text}%%'" 
+    q = f"SELECT *, ABS(Zipcode - {zipcode}) as zd FROM Library NATURAL JOIN LibraryBook WHERE ISBN LIKE '{isbn}' ORDER BY zd ASC" 
     splibrary = conn.execute(q)
     conn.close()
     return [r for r in splibrary]

@@ -19,48 +19,6 @@
 
         <div id="layoutSidenav_content">
             <main>
-
-                <div class="card mb-4">
-                    <div class="card-header">
-                        <i class="fas fa-table me-1"></i>
-                        Books Available to Borrow
-                    </div>
-                    <div class="card-body">
-                        <table id="AvailableBooks">
-                            <thead>
-                                <tr>
-                                    <th>Cover</th>
-                                    <th>ISBN</th>
-                                    <th>Title</th>
-                                    <th>Author</th>
-                                    <th>Publisher</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for book in books %}
-                                <tr>
-                                    <td><img alt="Cover" src={{ book.ImageURL }} width=80/></td>
-                                    <td>{{ book.ISBN }}</td>
-                                    <td>{{ book.Title }}</td>
-                                    <td>{{ book.Author }}</td>
-                                    <td>{{ book.Name }}</td>
-                                    <td>{{ book.Quantity }}</td>
-                                    <td>
-                                        <form action="" method="post" onsubmit="return confirm('{{ confirm_msg }}')">
-                                            <input type="hidden" name="isbn" value={{ book.ISBN }}>
-                                            <input type="hidden" name="library_id" value={{ book.LibraryID }}>
-                                            <input type="hidden" name="user_id" value={{ user.UserID }}>
-                                            <input type="hidden" name="return" value=0>
-                                            <button name="btnBorrow" class="btn btn-primary" type="submit">Borrow</button>
-                                        </form>
-                                    </td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            
                 <div class="card mb-4">
                     <div class="card-header">
                         <i class="fas fa-table me-1"></i>
