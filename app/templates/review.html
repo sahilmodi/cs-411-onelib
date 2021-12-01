@@ -60,7 +60,7 @@
                                         <tr>
                                             <form>
                                                 <td><input id="isbn" name="isbn" type="text" value={{isbns}} disabled="disabled"></td>
-                                                <td><input id="user_id" name="user_id" type="text" Type="text" value=""></td>
+                                                <td><input id="user_id" name="user_id" type="text" Type="text" value={{user.UserID}} disabled="disabled"></td>
                                                 <td><input id="date" name="date" Type="date"></td>
                                                 <script>
                                                     document.getElementById('date').value = new Date().toISOString().substring(0, 10);
