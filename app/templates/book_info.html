@@ -60,7 +60,7 @@
                                                     <input type="hidden" name="user_id" value={{ user.UserID }}>
                                                     <input type="hidden" name="return" value=0>
                                                     {% if library.Buyable and library.Quantity > 0 %}
-                                                        <button name="btnBorrow" class="btn btn-primary" type="submit">Buy</button>
+                                                        <button name="btnBorrow" class="btn btn-primary" type="submit">Buy (${{library.Price}})</button>
                                                     {% elif library.Quantity > 0 %}
                                                         <button name="btnBorrow" class="btn btn-primary" type="submit">Borrow</button>
                                                     {% else %}

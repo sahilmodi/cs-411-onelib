@@ -52,13 +52,11 @@ def login():
     email=request.form.get('email')
     password = request.form.get('password')
     u = user.login(email, password)
-    if u is not None:
-        if 'current_url' in session:
-            print("Redirecting to", session.get('current_url'))
-            return redirect(session.get('current_url'))
-        return homepage()
-    else:
+    if u is None:
         return render_template('login.html')
+    if 'current_url' in session:
+        return redirect(session.get('current_url'))
+    return homepage()
 
 
 def homepage():
@@ -138,20 +136,19 @@ def book_info(isbn):
             db_helper.checkout_book(request.values['user_id'], request.values['library_id'], request.values['isbn'])
         else:
             db_helper.return_book(request.values['user_id'], request.values['library_id'], request.values['isbn'])
-        # redirect(f"/book/{request.values['isbn']}")
 
     data = {}
     fee, score = db_helper.get_fee_score(user_id=u.UserID)
     data['confirm_msg'] = f"You have a library score of {score:0.2f} and owe ${fee:0.2f}."
     if score < 0.2 or fee > 10:
-        data['confirm_msg'] += " Due date will automatically be reduced to 1 week."
-    data['confirm_msg'] += ' Proceed with checkout?'
+        data['confirm_msg'] += " Due date will automatically be reduced to 1 week unless the book is bought."
+        data['confirm_msg'] += ' Proceed with checkout?'
     
     data['nearby_libraries'] = db_helper.fetch_splibrary(isbn, u.Zipcode)
     data['book'] = db_helper.fetch_bookinfo(isbn)[0]
     data['rate'] = db_helper.fetch_bookrate(isbn)[0]
-
     data['borrowed_books'] = db_helper.get_borrowed_books(user_id=u.UserID, amount=25)
+
     return render_template_with_nav("book_info.html", **data)
 
   
