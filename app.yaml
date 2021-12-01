@@ -7,11 +7,17 @@ env_variables:
   MYSQL_HOST: "34.134.18.205"
 
 handlers:
-- url: /img
-  static_dir: static/img
+# - url: /img
+#   static_dir: static/img
 
-- url: /script
-  static_dir: static/script
+# - url: /script
+#   static_dir: static/script
 
-- url: /styles
-  static_dir: static/styles
+# - url: /styles
+#   static_dir: static/styles
+
+- url: /css
+  static_dir: static/css
+
+- url: /js
+  static_dir: static/js
