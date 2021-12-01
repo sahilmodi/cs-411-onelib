@@ -140,20 +140,9 @@
                                             <th>StarRating</th>
                                             <th>Text</th>
                                             <th>Edit</th>
-                                            <th>Delet</th>
+                                            <th>Delete</th>
                                         </tr>
                                     </thead>
-                                    <tfoot>
-                                        <tr>
-                                            <th>ISBN</th>
-                                            <th>UserId</th>
-                                            <th>Date</th>
-                                            <th>StarRating</th>
-                                            <th>Text</th>
-                                            <th>Edit</th>
-                                            <th>Delet</th>
-                                        </tr>
-                                    </tfoot>
                                     <tbody>
                                         {% for review in reviews %}
                                         <tr>
@@ -162,10 +151,14 @@
                                             <td>{{ review.Date }}</td>
                                             <td>{{ review.StarRating }}</td>
                                             <td>{{ review.Text }}</td>
-                                            <th><button type="button" data-isbn="{{review.ISBN}}" data-userid="{{review.UserID}}" data-date="{{review.Date}}" data-starrating="{{review.StarRating}}" data-text="{{review.Text}}" class="btn btn-primary editreview">Edit</button></th>
+                                            {% if review.UserID == user.UserID %}
+                                            <th>
+                                                <button type="button" data-isbn="{{review.ISBN}}" data-userid="{{review.UserID}}" data-date="{{review.Date}}" data-starrating="{{review.StarRating}}" data-text="{{review.Text}}" class="btn btn-primary editreview">Edit</button>
+                                            </th>
                                             <th>
                                                 <button name="btnDelete" data-isbn="{{review.ISBN}}" data-userid="{{review.UserID}}" class="btn btn-primary remove deletereview" type="button">Delete</button>
                                             </th>
+                                            {% endif %}
                                         </tr>
                                         {% endfor %}
                                         <script>

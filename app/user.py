@@ -35,4 +35,11 @@ def login(email, password):
 def logout():
     set_current_user_id(None)
 
-
+def create_user(name, age, zipcode, payment_number, password, email):
+    with db.begin() as conn:
+        id = int(conn.execute('SELECT MAX(UserID) uid from User').fetchone().uid) + 1
+        age_str = f"'{age}'"
+        if not age:
+            age_str = "NULL"
+        q = f"INSERT INTO User VALUES ({id}, '{name}', {age_str}, '{zipcode}', '{payment_number}', '{password}', '{email}')"
+        conn.execute(q)

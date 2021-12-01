@@ -17,6 +17,9 @@ def register():
         firstname = request.form.get('firstname')
         lastname = request.form.get('lastname')
         email = request.form.get('email')
+        zipcode = request.form.get('zipcode')
+        age = request.form.get('age')
+        payment = request.form.get('payment')
         password = request.form.get('password')
         confirmpassword = request.form.get('confirmpassword')
 
@@ -26,16 +29,26 @@ def register():
             error = "Password is too short"
         elif password != confirmpassword:
             error = "Passwords do not match"
-        # else:
-            # db_helper.add
-            # query = "INSERT INTO User(id,firstname,lastname,email,password) VALUES (NULL, %s, %s, %s, %s)"
-            # cursor.execute(query, (firstname,lastname,email,password))
-            # success = "You account has been created"
+        
+        if len(zipcode) != 5:
+            error = 'Invalid Zipcode'
+        try:
+            payment = int(payment)
+        except:
+            error = 'Invalid payment number'
+
+        name = firstname + ' ' + lastname
+        if not error:
+            user.create_user(name, age, zipcode, payment, password, email)
+            success = "You account has been created"
 
     return render_template('register.html',error=error,msg=success)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    if request.args.get("logout", default=False, type=bool):
+        user.logout()
+        return render_template("login.html")
     email=request.form.get('email')
     password = request.form.get('password')
     u = user.login(email, password)

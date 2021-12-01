@@ -78,7 +78,7 @@ def read_from_table(table, amount=5):
     return [r for r in res]
 
 
-def fetch_bookreview(isbn) ->dict:
+def fetch_bookreview(isbn) -> dict:
     conn = db.connect()
     query='SELECT * FROM Review where ISBN LIKE "{}";'.format(isbn)
     query_results = conn.execute(query).fetchall()
